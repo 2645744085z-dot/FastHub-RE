@@ -18,7 +18,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - uses: android-actions/setup-android@v3
       - name: Clone upstream Android Use
         run: git clone --depth=1 https://github.com/Pegoku/android-use.git android-use
       - name: Translate UI and use separate package ID
