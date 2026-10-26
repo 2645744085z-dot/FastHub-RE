@@ -23,10 +23,11 @@ jobs:
       - name: Translate UI and use separate package ID
         run: python3 android-use-zh-cn/translate.py
       - uses: gradle/actions/setup-gradle@v4
-      - name: Install Android 37 SDK
+      - name: Install stable Android 36 SDK
         run: |
           SDKM=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f | head -1)
-          "$SDKM" 'platforms;android-37' 'build-tools;37.0.0'
+          "$SDKM" 'platforms;android-36' 'build-tools;36.0.0'
+          sed -i 's/compileSdk = 37/compileSdk = 36/; s/targetSdk = 37/targetSdk = 36/' android-use/app/build.gradle.kts
       - name: Build Android Release APK
         working-directory: android-use
         run: |
