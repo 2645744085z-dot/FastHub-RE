@@ -1,0 +1,47 @@
+name: Android Use Chinese APK
+
+on:
+  push:
+    branches:
+      - 'build/android-use-zh-cn-20261026'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - name: Clone upstream Android Use
+        run: git clone --depth=1 https://github.com/Pegoku/android-use.git android-use
+      - name: Translate UI and use separate package ID
+        run: python3 android-use-zh-cn/translate.py
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Install Android 37 SDK
+        run: sdkmanager 'platforms;android-37' 'build-tools;37.0.0'
+      - name: Build Android Release APK
+        working-directory: android-use
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease --stacktrace
+      - name: Inspect APK
+        run: |
+          APK=android-use/app/build/outputs/apk/release/app-release.apk
+          test -s "$APK"
+          sha256sum "$APK"
+          ls -lh "$APK"
+          mkdir -p dist
+          cp "$APK" dist/Android-Use-zh-CN.apk
+      - name: Upload Installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-Use-zh-CN
+          path: dist/Android-Use-zh-CN.apk
+          retention-days: 7
