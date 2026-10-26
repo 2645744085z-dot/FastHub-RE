@@ -154,6 +154,28 @@ for rel in targets:
         q = json.dumps(en, ensure_ascii=False)
         v = json.dumps(zh, ensure_ascii=False)
         data = data.replace(q, v)
+    if rel == "ui/Setup.kt":
+        data = data.replace(
+            '''message = "Couldn't start sign-in: ${it.message}"''',
+            '''message = if (it is java.net.BindException ||
+                it.message?.contains("EADDRINUSE", ignoreCase = true) == true ||
+                it.message?.contains("Address already in use", ignoreCase = true) == true
+            ) {
+                "登录端口 1455 已被占用。请先强制停止原版 Android Use，返回汉化版重试。如果仍失败，请重启手机。"
+            } else {
+                "无法启动登录：${it.message}"
+            }'''
+        )
+        data = data.replace(
+            '''"Replace Gemini: open Android Use over any app with long-press Home."''',
+            '''"代替 Gemini：在任意应用中长按 Home 键即可唤出安卓助手。"'''
+        ).replace(
+            '''"Long-press Home to chat or ask for something over any app."''',
+            '''"在任意应用中长按 Home 键，即可聊天或发出操作指令。"'''
+        ).replace(
+            '''if ("failed" in it || "Couldn't" in it)''',
+            '''if ("失败" in it || "无法" in it || "端口" in it || "failed" in it || "Couldn't" in it)'''
+        )
     if rel == "assistant/ChatEngine.kt":
         data = data.replace(
             "- Reply in the language the user writes in.",
